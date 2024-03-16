@@ -9,12 +9,12 @@ const Auth = getAuthUser();
 const UpdatePost = () => {
     const navigate = useNavigate();
     let { id } = useParams();
-    console.log(id)
     const [Post, setPost] = useState({
         name: "",
-        phone: "",
-        email: "",
-        status: "post",
+        description: "",
+        pic_url: "",
+        amountOfBudget: "",
+        allBudget:"",
         loading: true,
         err: null
     });
@@ -27,9 +27,7 @@ const UpdatePost = () => {
         })
         .then((resp) => {
             const posts = resp.data;
-            console.log(posts)
             const post = posts.find(post => parseInt(post.id) === parseInt(id));
-            console.log(post)
             if (post) {
                 setPost({
                     name: post.name,

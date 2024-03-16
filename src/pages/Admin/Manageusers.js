@@ -83,7 +83,9 @@ const Manageusers = () => {
             {Users.results.map((User, index) => (
     <tr key={User.id}>
       <td>{index + 1}</td>
-      <td>{User.name}</td>
+      <td> <Link to={`showhistory/${User.id}`}>
+     {User.name}
+        </Link></td>
       <td>{User.email}</td>
       <td>{User.phone}</td>
       <td>

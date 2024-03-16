@@ -26,9 +26,7 @@ const UpdateUser = () => {
         })
         .then((resp) => {
             const users = resp.data;
-            console.log(users)
             const user = users.find(user => parseInt(user.id) === parseInt(id));
-            console.log(user)
             if (user) {
                 setPost({
                     name: user.name,

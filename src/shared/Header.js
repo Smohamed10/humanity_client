@@ -15,34 +15,28 @@ const Header = () => {
     }
 
     return (
-      <div>
-      <Navbar bg="light" expand="lg">
+      <div style={{backgroundColor:"black"}}>
+      <Navbar expand="lg">
         <Container>
-          <Navbar.Brand as={Link} to="/" className="text-black h2 mb-0">
-            <strong>Humanity</strong> 
+          <Navbar.Brand as={Link} to="/" className="text-blue h2 mb-0">
+            <strong style={{color:'whitesmoke'}}>Humanity</strong> 
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link as={Link} to="/">Home</Nav.Link>
-              <Nav.Link as={Link} to="/about">About Us</Nav.Link>
-              {!Auth && <Nav.Link as={Link} to="/login">Login</Nav.Link>}
-              {!Auth && <Nav.Link as={Link} to="/register">Register</Nav.Link>}
-              <Nav.Link as={Link} to="/contact">Contact</Nav.Link>
-              {Auth && Auth[0].status === 'admin' && <Nav.Link as={Link} to="/manageusers">Manage Users</Nav.Link>}
-              {Auth && Auth[0].status === 'admin' && <Nav.Link as={Link} to="/managebookings">Manage Bookings</Nav.Link>}
+              <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/">Home</Nav.Link>
+              <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/about">About Us</Nav.Link>
+              {!Auth && <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/login">Login</Nav.Link>}
+              {!Auth && <Nav.Link  style={{color:'whitesmoke'}}as={Link} to="/register">Register</Nav.Link>}
+              {Auth && Auth[0].status==='user'&& <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/submitform">Submit a Form</Nav.Link>}
+              <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/contact">Contact</Nav.Link>
+              {Auth && Auth[0].status === 'admin' && <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/manageusers">Manage Users</Nav.Link>}
+              {Auth && Auth[0].status === 'admin' && <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/manageforms">Manage Forms</Nav.Link>}
+              {Auth && Auth[0].status === 'admin' && <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/manageposts">Manage Posts</Nav.Link>}
+
             </Nav>
             <Nav>
-              <Nav.Link href="https://www.facebook.com/mondy.rmadan?mibextid=LQQJ4d" className="pl-3 pr-3 text-black">
-                <span className="icon-facebook"></span>
-              </Nav.Link>
-              <Nav.Link href="https://wa.me/+2001009445487" className="pl-3 pr-3 text-black">
-                <span className="icon-whatsapp"></span>
-              </Nav.Link>
-              <Nav.Link href="https://www.instagram.com/mondyrmadan?igsh=MTdtOWwwcTJzcjY0eA==" className="pl-3 pr-3 text-black">
-                <span className="icon-instagram"></span>
-              </Nav.Link>
-              {Auth && <Nav.Link onClick={Logout} className='btn btn-sm btn-danger mx-2'>Logout</Nav.Link>}
+              {Auth && <Nav.Link style={{color:'red'}} onClick={Logout} className='btn btn-sm btn-danger mx-2'>Logout</Nav.Link>}
             </Nav>
           </Navbar.Collapse>
         </Container>

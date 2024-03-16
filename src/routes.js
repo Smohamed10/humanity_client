@@ -14,6 +14,9 @@ import Manageusers from "./pages/Admin/Manageusers";
 import UpdateUser from "./pages/Admin/UpdateUser";
 import Manageposts from "./pages/Admin/Manageposts";
 import UpdatePost from "./pages/Admin/UpdatePost";
+import SubmitForm from "./pages/SubmitForm/SubmitForm";
+import UserHistory from "./pages/Admin/UserHistory";
+import ManageForms from "./pages/Admin/ManageForms";
 
 
 export const routes = createBrowserRouter([
@@ -37,7 +40,9 @@ export const routes = createBrowserRouter([
                 {
                     path: "/Login",
                     element: <Login/>,
-                },]
+                },
+
+            ]
             },
             {
                 element:<Admin/>,
@@ -63,6 +68,10 @@ export const routes = createBrowserRouter([
                                 path: "updateuser/:id",
                                 element: <UpdateUser/>,
                             },
+                            {
+                                path: "showhistory/:id",
+                                element: <UserHistory/>,
+                            },
                         ]
         
                     },
@@ -81,6 +90,10 @@ export const routes = createBrowserRouter([
                         ]
         
                     },
+                    {
+                        path: "/manageforms",
+                        element: <ManageForms/>,
+                    },
 
                 ]
             },
@@ -97,7 +110,10 @@ export const routes = createBrowserRouter([
                 path: "/about",
                 element: <About/>,
             },            
-            
+            {
+                path: "/submitform",
+                element: <SubmitForm/>,
+            },
         ],
     },
     {
