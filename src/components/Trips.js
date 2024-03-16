@@ -10,7 +10,6 @@ const carouselHeight = window.innerWidth < 768 ? "200px" : "400px";
 
 const Trips = (props) => {
   const navigate = useNavigate();
-  const formattedDate = new Date(props.date).toISOString().split('T')[0];
   const [showModal, setShowModal] = React.useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false); // State to track booking success
 
@@ -81,7 +80,7 @@ const Trips = (props) => {
             <h2 className="font-weight-light text-black mb-4">
               <span className="mr-3">&#128184; {props.salary}$</span>
               <span className="mr-3">
-                <i className="fa fa-calendar mr-2" style={{ fontSize: '36px', color: 'blue' }}></i>{formattedDate}
+                <i className="fa fa-calendar mr-2" style={{ fontSize: '36px', color: 'blue' }}></i>{/*formattedDate*/}
               </span>
               <span>&#128337; {props.time}</span>
             </h2>

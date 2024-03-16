@@ -12,9 +12,9 @@ import { getAuthUser } from '../../Helper/Storage';
 
 const Auth = getAuthUser();
 
-const ManageTrips = () => {
+const Manageposts = () => {
   const navigate = useNavigate();
-  const [trips, setTrips] = useState({
+  const [posts, setposts] = useState({
     loading: true,
     results: [],
     err: null,
@@ -22,25 +22,24 @@ const ManageTrips = () => {
   });
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [selectedTripId, setSelectedTripId] = useState(null);
-
+  const [selectedpostId, setSelectedpostId] = useState(null);
   useEffect(() => {
-    setTrips((prevState) => ({ ...prevState, loading: true }));
-    axios.get("https://mondy-magic-server.onrender.com/gettrip",{
-      params: {
-        category: "All" // Pass selected option as query parameter
+    setposts((prevState) => ({ ...prevState, loading: true }));
+    axios.get("http://localhost:5000/getposts",{
+      headers:{
+          token:Auth[0].token,
       }
     })
       .then((resp) => {
-        setTrips((prevState) => ({ ...prevState, results: resp.data, loading: false, err: null }));
+        setposts((prevState) => ({ ...prevState, results: resp.data, loading: false, err: null }));
       })
       .catch(() => {
-        setTrips((prevState) => ({ ...prevState, loading: false, err: 'Something Went Wrong' }));
+        setposts((prevState) => ({ ...prevState, loading: false, err: 'Something Went Wrong' }));
       });
-  }, [trips.reload]);
+  }, [posts.reload]);
 
-  const handleDeleteTrip = (tripId) => {
-    setSelectedTripId(tripId);
+  const handleDeletepost = (postId) => {
+    setSelectedpostId(postId);
     setShowConfirmationModal(true);
   };
 
@@ -49,13 +48,17 @@ const ManageTrips = () => {
 
     if (confirmed) {  
       try {
-        await axios.delete(`https://mondy-magic-server.onrender.com/deletetrip/${selectedTripId}`);
-        // Reload trips or update the state as needed
-        setTrips((prevState) => ({ ...prevState, reload: prevState.reload + 1 }));
-        navigate('/');
+        await axios.delete(`http://localhost:5000/deletepost/${selectedpostId}`,{
+          headers:{
+            token:Auth[0].token,
+        }
+        });
+        // Reload posts or update the state as needed
+        setposts((prevState) => ({ ...prevState, reload: prevState.reload + 1 }));
+        navigate('/manageposts');
       } catch (error) {
         // Handle error, if needed
-        console.error('An error occurred while deleting the trip.', error);
+        console.error('An error occurred while deleting the post.', error);
       }
     }
   };
@@ -63,41 +66,37 @@ const ManageTrips = () => {
   return (
     <div className="site-section" data-aos="fade-up">
       <div className="container">
-        <Link to="/post" className="header r-flex justify-content-between mb-5">
-          <button className='btn btn-sm btn-success'>Add Trip</button>
-        </Link>
+
         <div className="table-responsive">
           <Table striped bordered hover className='table'>
           <thead>
             <tr>
               <th>#</th>
-              <th>image</th>
-              <th>Destination</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Price</th>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Budget Amount</th>
+              <th>All Budget</th>
               <th>Action</th>
+
             </tr>
           </thead>
           <tbody>
             
-            {trips.results.map((trip, index) => (
-    <tr key={trip.id}>
+            {posts.results.map((post, index) => (
+    <tr key={post.id}>
       <td>{index + 1}</td>
+      <td><img  className='image-avatar' src={post.pic_url} alt={`image`+post.id}></img></td>
+      <td>{post.name}</td>
+      <td>{post.description}</td>
+      <td>{post.amountOfBudget}</td>
+      <td>{post.allBudget}</td>
+
       <td>
-        {trip.master_image && trip.master_image.length > 0 && (
-          <img src={trip.master_image.split(',')[0]} className='image-avatar' alt={trip.name} />
-        )}
-      </td>
-      <td>{trip.name}</td>
-      <td>{new Date(trip.date).toISOString().split('T')[0]}</td>
-      <td>{trip.time}</td>
-      <td>{trip.salary}</td>
-      <td>
-        <Link to={`update/${trip.id}`} className="header r-flex justify-content-between mb-5">
+        <Link to={`updatepost/${post.id}`} className="header r-flex justify-content-between mb-5">
           <button className='btn btn-sm btn-info'>Update</button>
         </Link>
-        <button onClick={() => handleDeleteTrip(trip.id)} className='btn btn-sm btn-danger mx-2'>Delete</button>
+        <button onClick={() => handleDeletepost(post.id)} className='btn btn-sm btn-danger mx-2'>Delete</button>
       </td>
     </tr>
   ))}
@@ -107,7 +106,7 @@ const ManageTrips = () => {
       </div>
       </div>
 
-      {trips.loading === true && (
+      {posts.loading === true && (
     <div className="loading-spinner-overlay">
     <div className="loading-spinner-container">
         <div className="loading-spinner">&#9765;</div>
@@ -120,7 +119,7 @@ const ManageTrips = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this trip?</Modal.Body>
+        <Modal.Body>Are you sure you want to delete this post?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => handleConfirmation(false)}>
             No
@@ -134,4 +133,4 @@ const ManageTrips = () => {
   );
 };
 
-export default ManageTrips;
+export default Manageposts;

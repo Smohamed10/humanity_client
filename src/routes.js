@@ -6,12 +6,14 @@ import Login from "./pages/Auth/login";
 import CreatePost from "./pages/Admin/CreatePost";
 import Contact from "./pages/Contact/contact";
 import About from "./pages/About/about";
-import ManageTrips from "./pages/Admin/ManageTrips";
-import UpdateTrip from "./pages/Admin/UpdateTrip";
 import Details from "./pages/Details/Details";
 import Guest from "./middleware/Guest";
 import Admin from "./middleware/Admin";
 import ViewBookings from "./pages/Admin/ViewBookings";
+import Manageusers from "./pages/Admin/Manageusers";
+import UpdateUser from "./pages/Admin/UpdateUser";
+import Manageposts from "./pages/Admin/Manageposts";
+import UpdatePost from "./pages/Admin/UpdatePost";
 
 
 export const routes = createBrowserRouter([
@@ -50,16 +52,31 @@ export const routes = createBrowserRouter([
                         element: <ViewBookings/>,
                     },
                     {
-                        path: "/managetrips",
+                        path: "/manageusers",
                         children:[
                             {
                             path:"",                
-                            element: <ManageTrips/>,
+                            element: <Manageusers/>,
                             },
         
                             {
-                                path: "update/:id",
-                                element: <UpdateTrip/>,
+                                path: "updateuser/:id",
+                                element: <UpdateUser/>,
+                            },
+                        ]
+        
+                    },
+                    {
+                        path: "/manageposts",
+                        children:[
+                            {
+                            path:"",                
+                            element: <Manageposts/>,
+                            },
+        
+                            {
+                                path: "updatepost/:id",
+                                element: <UpdatePost/>,
                             },
                         ]
         

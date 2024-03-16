@@ -1,35 +1,24 @@
 import React, { useState } from "react";
 import axios from 'axios';
 import Alert from 'react-bootstrap/Alert';
-import DatePicker from "react-datepicker";
-import TimePicker from 'react-time-picker';
-import 'react-time-picker/dist/TimePicker.css';
-import 'react-clock/dist/Clock.css';
-import "react-datepicker/dist/react-datepicker.css";
 import "../../Assets/css/spinner.css";
 import { getAuthUser } from '../../Helper/Storage';
 import { useNavigate } from "react-router-dom";
-import Dropdown from 'react-bootstrap/Dropdown'; // Import Dropdown component
 
 const Auth = getAuthUser();
 
 const CreatePost = () => {
-    const [images, setImages] = useState([]);
+    const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [startDate, setStartDate] = useState(new Date());
-    const [value, onChange] = useState('10:00');
     const [preview, setPreview] = useState(null);
-    const [selectedCategory, setSelectedCategory] = useState("All"); // State for the selected dropdown option
     const navigate = useNavigate();
 
     const [Post, setPost] = useState({
-        master_image: [],
+        pic_url: "",
         name: "",
         description: "",
-        date: "",
-        time: "",
-        salary: "",
-        public_id: [],
+        amountOfBudget: "",
+        allBudget: "",
         loading: false,
         err: []
     });
@@ -37,104 +26,77 @@ const CreatePost = () => {
     const Do_Post = async (e) => {
         e.preventDefault();
 
+        setPost({ ...Post, loading: true, err: [] });
         try {
-            const { imageUrls, publicIds } = await uploadImages(); // Wait for image upload to complete
+            const imageUrl = await uploadImage(); // Wait for image upload to complete
 
-            if (imageUrls.length > 0) {
-                const Date = startDate.toISOString().split('T')[0]; // Correct date format
-                const Time = value;
-
-                setPost({ ...Post, loading: true, err: [] });
-                console.log(imageUrls.join(','))
-                axios.post("https://mondy-magic-server.onrender.com/createtrip", {
-                    master_image: imageUrls.join(','),
+            if (imageUrl) {
+                const response = await axios.post("http://localhost:5000/createpost", {
+                    pic_url: imageUrl,
                     name: Post.name,
-                    date: Date,
-                    time: Time,
-                    salary: Post.salary,
                     description: Post.description,
-                    public_id: publicIds.join(','),
-                    category: selectedCategory // Include selected category in Axios request
-                },
-                ).then(resp => {
-                    console.log(resp);
-                    navigate("/");
-                    setPost({ ...Post, loading: false, err: [] });
-
-                }).catch((errors) => {
-                    console.log(errors);
-                    setPost({ ...Post, loading: false, err: [errors.response.data.msg] });
-                    console.log([errors.response.data.msg]);
+                    amountOfBudget:Post.amountOfBudget,
+                    allBudget:Post.allBudget,
+                }, {
+                    headers: {
+                        token: Auth[0].token,
+                    },
                 });
+                console.log(response);
+                navigate("/");
             } else {
-                console.error("Image upload failed or master_image is empty.");
+                console.error("Image upload failed.");
             }
         } catch (error) {
             console.log(error);
+            setPost({ ...Post, loading: false, err: [error.response.data.msg || "An error occurred."] });
         }
+        setPost({ ...Post, loading: false });
     };
 
     const handleImageChange = (event) => {
-        const files = event.target.files;
-        setImages(files);
-
-        const imagesPreview = [];
-        for (let i = 0; i < files.length; i++) {
-            const reader = new FileReader();
-            reader.readAsDataURL(files[i]);
-            reader.onload = () => {
-                imagesPreview.push(reader.result);
-                if (imagesPreview.length === files.length) {
-                    setPreview(imagesPreview);
-                }
-            };
-        }
+        const file = event.target.files[0];
+        setImage(file);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            setPreview(reader.result);
+        };
     };
 
     const handleResetClick = () => {
         setPreview(null);
-        setImages([]);
+        setImage(null);
     };
 
-    const uploadImages = async () => {
-        if (images.length === 0) {
-            console.error("No images to upload.");
-            return { imageUrls: [], publicIds: [] };
+    const uploadImage = async () => {
+        if (!image) {
+            console.error("No image to upload.");
+            return null;
         }
-
         setLoading(true);
-        const imageUrls = [];
-        const publicIds = [];
-
-        for (let i = 0; i < images.length; i++) {
-            const data = new FormData();
-            data.append("file", images[i]);
-            data.append("upload_preset", "Mondy_Magic");
-            data.append("cloud_name", "dfdjpb4g9");
-
-            try {
-                const response = await fetch(
-                    `https://api.cloudinary.com/v1_1/dfdjpb4g9/image/upload`,
-                    {
-                        method: "POST",
-                        body: data,
-                    }
-                );
-                const res = await response.json();
-                imageUrls.push(res.secure_url);
-                publicIds.push(res.public_id);
-            } catch (error) {
-                console.error(error);
-            }
+        const data = new FormData();
+        data.append("file", image);
+        data.append("upload_preset", "alfarama");
+        data.append("cloud_name", "dyeqmtxsd");
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/dyeqmtxsd/image/upload`, {
+                method: "POST",
+                body: data,
+            });
+            const res = await response.json();
+            setLoading(false);
+            return res.secure_url;
+        } catch (error) {
+            setLoading(false);
+            console.error(error);
+            return null;
         }
-
-        setLoading(false);
-        return { imageUrls, publicIds };
     };
 
     return (
         <div>
-            <h1>New Post</h1>
+            <h1>Post Name</h1>
             {Post.err.map((error, index) => (
                 <Alert key={index} variant='danger'>
                     {error}
@@ -145,71 +107,43 @@ const CreatePost = () => {
 
                     <div className="row form-group">
                         <div className="col-md-8 mb-3 mb-md-0">
-                            <label className="text-black" htmlFor="fname">Trip Destination</label>
+                            <label className="text-black" htmlFor="fname">Post Name</label>
                             <input required type="text" id="fname" className="form-control" value={Post.name} onChange={(e) => setPost({ ...Post, name: e.target.value })} />
                         </div>
+                    </div>
 
-                        <div className="col-md-2 mb-3 mb-md-0">
-                            <label className="text-black" htmlFor="fname">Pick The Date</label>
-                            <DatePicker required selected={startDate} id="fname" className="form-control" onChange={(date) => setStartDate(date)} />
-                            <input type="hidden" name="date" value={startDate.toISOString().split('T')[0]} />
-                        </div>
-
-                        <div className="col-md-2 mb-3 mb-md-0">
-                            <label className="text-black" htmlFor="lname">Pick The Time</label>
-                            <TimePicker required id="lname" className="form-control" onChange={onChange} value={value} />
-                            <input type="hidden" name="time" value={value} />
+                    <div className="row form-group">
+                        <div className="col-md-12">
+                            <label className="text-black" htmlFor="subject">Amount Of Budget</label>
+                            <input required type="number" id="subject" className="form-control" value={Post.amountOfBudget} onChange={(e) => setPost({ ...Post, amountOfBudget: e.target.value })} />
                         </div>
                     </div>
 
                     <div className="row form-group">
                         <div className="col-md-12">
-                            <label className="text-black" htmlFor="category">Category</label>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="primary" id="dropdown-basic">
-                                    {selectedCategory}
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu>
-                                    <Dropdown.Item onClick={() => setSelectedCategory("All")}>All</Dropdown.Item>
-                                    <Dropdown.Item onClick={() => setSelectedCategory("Full Day")}>Full Day</Dropdown.Item>
-                                    <Dropdown.Item onClick={() => setSelectedCategory("Half Day")}>Half Day</Dropdown.Item>
-                                    <Dropdown.Item onClick={() => setSelectedCategory("Night tours")}>Night tours</Dropdown.Item>
-                                    <Dropdown.Item onClick={() => setSelectedCategory("Packages")}>Packages</Dropdown.Item>
-                                    <Dropdown.Item onClick={() => setSelectedCategory("Special Offers")}>Special Offers</Dropdown.Item>
-                                    <Dropdown.Item onClick={() => setSelectedCategory("VIP")}>VIP</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                            <label className="text-black" htmlFor="subject">All Budget</label>
+                            <input required type="number" id="subject" className="form-control" value={Post.allBudget} onChange={(e) => setPost({ ...Post, allBudget: e.target.value })} />
                         </div>
                     </div>
 
                     <div className="row form-group">
                         <div className="col-md-12">
-                            <label className="text-black" htmlFor="subject">Price</label>
-                            <input required type="number" id="subject" className="form-control" value={Post.salary} onChange={(e) => setPost({ ...Post, salary: e.target.value })} />
+                            <label className="text-black" htmlFor="Description">Post Description</label>
+                            <textarea required value={Post.description} onChange={(e) => setPost({ ...Post, description: e.target.value })} name="message" id="message" cols="30" rows="7" className="form-control" placeholder="Write post Details Here..."></textarea>
                         </div>
                     </div>
 
                     <div className="row form-group">
                         <div className="col-md-12">
-                            <label className="text-black" htmlFor="Description">Trip Details</label>
-                            <textarea required value={Post.description} onChange={(e) => setPost({ ...Post, description: e.target.value })} name="message" id="message" cols="30" rows="7" className="form-control" placeholder="Write Trip Details Here..."></textarea>
+                            <label className="text-black" htmlFor="subject">Upload Post Photo</label>
+                            <input required id="subject" type="file" className="form-control" onChange={handleImageChange} accept="image/*" />
+                            {preview && <img src={preview} alt="preview" className="img-fluid rounded" />}
                         </div>
                     </div>
 
                     <div className="row form-group">
                         <div className="col-md-12">
-                            <label className="text-black" htmlFor="subject">Upload Destination Photo</label>
-                            <input required id="subject" type="file" className="form-control" onChange={handleImageChange} accept="image/*" multiple />
-                            {preview && preview.map((image, index) => (
-                                <img key={index} src={image} alt={`preview-${index}`} className="img-fluid rounded" />
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="row form-group">
-                        <div className="col-md-12">
-                            <input disabled={images.length === 0} type="submit" value="Post Now" className="btn btn-primary py-2 px-4 text-white" />
+                            <input disabled={!image} type="submit" value="Post Now" className="btn btn-primary py-2 px-4 text-white" />
                         </div>
                     </div>
 

@@ -23,7 +23,7 @@ const Home = () => {
 
   useEffect(() => {
     setTrips(prevState => ({ ...prevState, loading: true }));
-    axios.get("https://mondy-magic-server.onrender.com/gettrip", {
+    axios.get("http://localhost:5000/getposts", {
       params: { category: selectedOption }
     })
     .then(resp => {
@@ -46,7 +46,6 @@ const Home = () => {
         <Container>
           <Row className="justify-content-center mb-5">
             <Col md={7} className="text-center">
-              <img src={sphinx} alt="Sphinx" thumbnail className="img-fluid mb-3" />
               <h2 className="font-weight-light text-black">Our Destinations</h2>
               <p className="color-black-opacity-5">Choose Your Next Destination</p>
               <Form>
@@ -84,15 +83,14 @@ const Home = () => {
               {filteredTrips.length > 0 ? (
                 filteredTrips.map((trip) => (
                   <Row key={trip.id}>
-                    <Trips
+                    {/*<Trips
                       id={trip.id}
                       name={trip.name}
                       description={trip.description}
-                      date={trip.date}
-                      time={trip.time}
-                      salary={trip.salary}
-                      master_image={trip.master_image}
-                    />
+                      pic_url={trip.pic_url}
+                      amountOfBudget={trip.amountOfBudget}
+                      allBudget={trip.allBudget}
+                />*/}
                   </Row>
                 ))
               ) : (

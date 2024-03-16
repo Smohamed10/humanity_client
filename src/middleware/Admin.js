@@ -4,6 +4,6 @@ import { getAuthUser } from '../Helper/Storage';
 
 const Admin = () => {
     const Auth= getAuthUser();
-    return<>{Auth &&Auth[0].status===1 ? <Outlet/> : <Navigate to={"/"}/>}</>;
+    return<>{Auth &&Auth[0].status==='admin' ? <Outlet/> : <Navigate to={"/"}/>}</>;
 };
 export default Admin;
