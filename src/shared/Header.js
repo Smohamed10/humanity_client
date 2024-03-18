@@ -30,6 +30,7 @@ const Header = () => {
               {!Auth && <Nav.Link  style={{color:'whitesmoke'}}as={Link} to="/register">Register</Nav.Link>}
               {Auth && Auth[0].status==='user'&& <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/submitform">Submit a Form</Nav.Link>}
               <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/contact">Contact</Nav.Link>
+              {Auth && Auth[0].status === 'admin' && <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/post">Create Post</Nav.Link>}
               {Auth && Auth[0].status === 'admin' && <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/manageusers">Manage Users</Nav.Link>}
               {Auth && Auth[0].status === 'admin' && <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/manageforms">Manage Forms</Nav.Link>}
               {Auth && Auth[0].status === 'admin' && <Nav.Link style={{color:'whitesmoke'}} as={Link} to="/manageposts">Manage Posts</Nav.Link>}

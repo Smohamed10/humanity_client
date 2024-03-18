@@ -1,17 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import Alert from 'react-bootstrap/Alert';
 import "../../Assets/css/spinner.css";
 import { getAuthUser } from '../../Helper/Storage';
 import { useNavigate } from "react-router-dom";
 
-const Auth = getAuthUser();
-
 const CreatePost = () => {
+    const navigate = useNavigate();
+    const [auth, setAuth] = useState(null); // State to hold authentication information
+
+    useEffect(() => {
+        // Retrieve authentication information when component mounts
+        const authInfo = getAuthUser();
+        setAuth(authInfo);
+    }, []);
+
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const [preview, setPreview] = useState(null);
-    const navigate = useNavigate();
 
     const [Post, setPost] = useState({
         pic_url: "",
@@ -35,11 +41,11 @@ const CreatePost = () => {
                     pic_url: imageUrl,
                     name: Post.name,
                     description: Post.description,
-                    amountOfBudget:Post.amountOfBudget,
-                    allBudget:Post.allBudget,
+                    amountOfBudget: Post.amountOfBudget,
+                    allBudget: Post.allBudget,
                 }, {
                     headers: {
-                        token: Auth[0].token,
+                        token: auth && auth[0] && auth[0].token, // Access token only if auth exists and has a token
                     },
                 });
                 console.log(response);
@@ -96,7 +102,7 @@ const CreatePost = () => {
 
     return (
         <div>
-            <h1>Post Name</h1>
+            <h1>Create Post</h1>
             {Post.err.map((error, index) => (
                 <Alert key={index} variant='danger'>
                     {error}
@@ -106,7 +112,7 @@ const CreatePost = () => {
                 <form onSubmit={Do_Post} action="#" className="p-5 bg-white">
 
                     <div className="row form-group">
-                        <div className="col-md-8 mb-3 mb-md-0">
+                        <div className="col-md-12 mb-3 mb-md-0">
                             <label className="text-black" htmlFor="fname">Post Name</label>
                             <input required type="text" id="fname" className="form-control" value={Post.name} onChange={(e) => setPost({ ...Post, name: e.target.value })} />
                         </div>

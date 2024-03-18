@@ -7,13 +7,11 @@ import Button from 'react-bootstrap/Button';
 import "../../Assets/css/spinner.css";
 import "../../css/avatar.css";
 import { useNavigate } from "react-router-dom";
-
 import { getAuthUser } from '../../Helper/Storage';
-
-const Auth = getAuthUser();
 
 const Manageusers = () => {
   const navigate = useNavigate();
+  const [auth, setAuth] = useState(null); // State to hold authentication information
   const [Users, setUsers] = useState({
     loading: true,
     results: [],
@@ -23,20 +21,30 @@ const Manageusers = () => {
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+
   useEffect(() => {
-    setUsers((prevState) => ({ ...prevState, loading: true }));
-    axios.get("http://localhost:5000/usersget",{
-      headers:{
-          token:Auth[0].token,
-      }
-    })
-      .then((resp) => {
-        setUsers((prevState) => ({ ...prevState, results: resp.data, loading: false, err: null }));
+    // Retrieve authentication information when component mounts
+    const authInfo = getAuthUser();
+    setAuth(authInfo);
+  }, []);
+
+  useEffect(() => {
+    // Fetch user data only if auth information is available
+    if (auth) {
+      setUsers((prevState) => ({ ...prevState, loading: true }));
+      axios.get("http://localhost:5000/usersget", {
+        headers: {
+          token: auth[0].token,
+        }
       })
-      .catch(() => {
-        setUsers((prevState) => ({ ...prevState, loading: false, err: 'Something Went Wrong' }));
-      });
-  }, [Users.reload]);
+        .then((resp) => {
+          setUsers((prevState) => ({ ...prevState, results: resp.data, loading: false, err: null }));
+        })
+        .catch(() => {
+          setUsers((prevState) => ({ ...prevState, loading: false, err: 'Something Went Wrong' }));
+        });
+    }
+  }, [auth]);
 
   const handleDeleteUser = (UserId) => {
     setSelectedUserId(UserId);
@@ -46,12 +54,12 @@ const Manageusers = () => {
   const handleConfirmation = async (confirmed) => {
     setShowConfirmationModal(false);
 
-    if (confirmed) {  
+    if (confirmed) {
       try {
-        await axios.delete(`http://localhost:5000/userdelete/${selectedUserId}`,{
-          headers:{
-            token:Auth[0].token,
-        }
+        await axios.delete(`http://localhost:5000/userdelete/${selectedUserId}`, {
+          headers: {
+            token: auth[0].token,
+          }
         });
         // Reload Users or update the state as needed
         setUsers((prevState) => ({ ...prevState, reload: prevState.reload + 1 }));
@@ -69,47 +77,47 @@ const Manageusers = () => {
 
         <div className="table-responsive">
           <Table striped bordered hover className='table'>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-            {Users.results.map((User, index) => (
-    <tr key={User.id}>
-      <td>{index + 1}</td>
-      <td> <Link to={`showhistory/${User.id}`}>
-     {User.name}
-        </Link></td>
-      <td>{User.email}</td>
-      <td>{User.phone}</td>
-      <td>
-        <Link to={`updateuser/${User.id}`} className="header r-flex justify-content-between mb-5">
-          <button className='btn btn-sm btn-info'>Update</button>
-        </Link>
-        <button onClick={() => handleDeleteUser(User.id)} className='btn btn-sm btn-danger mx-2'>Delete</button>
-      </td>
-    </tr>
-  ))}
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
 
-          </tbody>
-        </Table>
-      </div>
+              {Users.results.map((User, index) => (
+                <tr key={User.id}>
+                  <td>{index + 1}</td>
+                  <td> <Link to={`showhistory/${User.id}`}>
+                    {User.name}
+                  </Link></td>
+                  <td>{User.email}</td>
+                  <td>{User.phone}</td>
+                  <td>
+                    <Link to={`updateuser/${User.id}`} className="header r-flex justify-content-between mb-5">
+                      <button className='btn btn-sm btn-info'>Update</button>
+                    </Link>
+                    <button onClick={() => handleDeleteUser(User.id)} className='btn btn-sm btn-danger mx-2'>Delete</button>
+                  </td>
+                </tr>
+              ))}
+
+            </tbody>
+          </Table>
+        </div>
       </div>
 
       {Users.loading === true && (
-    <div className="loading-spinner-overlay">
-    <div className="loading-spinner-container">
-        <div className="loading-spinner">&#9765;</div>
-        <span>Loading...</span>
-    </div>
-</div>
-        )}
+        <div className="loading-spinner-overlay">
+          <div className="loading-spinner-container">
+            <div className="loading-spinner">&#9765;</div>
+            <span>Loading...</span>
+          </div>
+        </div>
+      )}
       {/* Confirmation Modal */}
       <Modal show={showConfirmationModal} onHide={() => handleConfirmation(false)}>
         <Modal.Header closeButton>

@@ -6,10 +6,16 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from "react-router-dom";
 import { getAuthUser } from '../../Helper/Storage';
 
-const Auth = getAuthUser();
-
 const ManageForms = () => {
   const navigate = useNavigate();
+  const [auth, setAuth] = useState(null); // State to hold authentication information
+
+  useEffect(() => {
+    // Retrieve authentication information when component mounts
+    const authInfo = getAuthUser();
+    setAuth(authInfo);
+  }, []);
+
   const [formss, setformss] = useState({
     loading: true,
     results: [],
@@ -25,8 +31,8 @@ const ManageForms = () => {
   useEffect(() => {
     setformss((prevState) => ({ ...prevState, loading: true }));
 
-    // Only fetch forms if there's a selected option
-    if (selectedOption) {
+    // Only fetch forms if there's a selected option and authentication information is available
+    if (selectedOption && auth) {
       let url = "";
 
       switch (selectedOption) {
@@ -45,7 +51,7 @@ const ManageForms = () => {
 
       axios.get(url, {
         headers: {
-          token: Auth[0].token,
+          token: auth[0].token,
         }
       })
         .then((resp) => {
@@ -55,10 +61,10 @@ const ManageForms = () => {
           setformss((prevState) => ({ ...prevState, loading: false, results: [], err: 'No forms found for the selected option' } ));
         });
     } else {
-      // Clear forms if no option is selected
+      // Clear forms if no option is selected or authentication information is not available
       setformss((prevState) => ({ ...prevState, results: [], loading: false, err: null }));
     }
-  }, [formss.reload, selectedOption]);
+  }, [formss.reload, selectedOption, auth]);
 
   const handleDeleteforms = (formsId) => {
     setSelectedformsId(formsId);
@@ -80,7 +86,7 @@ const ManageForms = () => {
               {
                   headers:
                   {
-                      token:Auth[0].token
+                      token: auth[0].token
                   }
               });
         setformss((prevState) => ({ ...prevState, reload: prevState.reload + 1 }));
@@ -101,7 +107,7 @@ const ManageForms = () => {
             {
                 headers:
                 {
-                    token:Auth[0].token
+                    token: auth[0].token
                 }
             }
         );
@@ -120,7 +126,7 @@ const ManageForms = () => {
         <div>
           <label htmlFor="selectOption">Select Option: </label>
           <select id="selectOption" onChange={(e) => setSelectedOption(e.target.value)}>
-            <option value="">All</option>
+            <option value="">Select Type</option>
             <option value="poor">Poor</option>
             <option value="accepted">Accepted</option>
             <option value="volunteer">Volunteer</option>

@@ -4,8 +4,6 @@ import axios from 'axios';
 import { useParams } from "react-router-dom";
 import { getAuthUser } from '../../Helper/Storage';
 
-const Auth = getAuthUser();
-
 const UserHistory = () => {
     const { id } = useParams();
     const [history, setHistory] = useState({
@@ -14,12 +12,15 @@ const UserHistory = () => {
         err: null
     });
 
+    // Retrieve authentication information
+    const auth = getAuthUser();
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/userhistory/${id}`, {
                     headers: {
-                        token: Auth[0].token,
+                        token: auth[0].token, // Use auth to access the token
                     }
                 });
                 setHistory({ loading: false, data: response.data, err: null });
@@ -29,9 +30,10 @@ const UserHistory = () => {
         };
 
         fetchData();
-    }, [id]);
+    }, [id, auth]); // Include auth in the dependency array
 
     return (
+        <div>
         <div className="site-section" data-aos="fade-up">
             <div className="container">
                 <div className="table-responsive">
@@ -65,9 +67,8 @@ const UserHistory = () => {
                     </Table>
                 </div>
             </div>
-            
         </div>
-        
+        </div>
     );
 };
 

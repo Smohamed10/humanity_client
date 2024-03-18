@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 import Alert from 'react-bootstrap/Alert';
 import { useNavigate } from 'react-router-dom';
-import { setAuthUser} from '../../Helper/Storage';
+import { setAuthUser } from '../../Helper/Storage';
 import { Link } from 'react-router-dom';
 
 const Login = () => {
@@ -15,7 +15,14 @@ const Login = () => {
         err: []
     });
 
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate(`/`);
+        }
+    }, [isAuthenticated, navigate]);
 
     const doLogin = (e) => {
         e.preventDefault();
@@ -25,8 +32,8 @@ const Login = () => {
             password: loginData.password,
         }).then(resp => {
             setLoginData({ ...loginData, loading: false, err: [] });
-            setAuthUser (resp.data);           
-            navigate(`/`); 
+            setAuthUser(resp.data);
+            setIsAuthenticated(true); // Update authentication state
         }).catch((errors) => {
             console.log(errors);
             setLoginData({ ...loginData, loading: false, err: [errors.response.data.msg] });
