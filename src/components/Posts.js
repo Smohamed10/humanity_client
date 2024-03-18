@@ -74,7 +74,7 @@ const Posts = (props) => {
             </h2>
             <h2 className="font-weight-light text-black mb-4">
 
-            <span className="mr-3">&#128184; {props.amountOfBudget} &nbsp;All Budget</span>
+            <span className="mr-3">&#128184; {props.allBudget} &nbsp;All Budget</span>
             </h2>
 
             <h5 className="font-weight-light text-black mb-4">{props.description}</h5>
